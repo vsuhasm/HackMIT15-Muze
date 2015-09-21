@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>MUZE</title>
+    <script src="https://www.google.com/jsapi"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <style type="text/css">
+    #logo img{
+      display:block; 
+      margin:auto;
+    }
+
+    #branding{
+      display:block; 
+      margin:auto;
+      text-align: center;
+    }
+
+    </style>
+  </head>
+  <body style="font-family: Arial;border: 0 none;">
+    <div id="logo">
+      <img src="MUZELogo.jpg" height="80" width="150">
+    </div>
+    <div id="branding"></div>
+    
+    <script>
+    $(document).ready(function() {
+      getLocation();
+  });</script>
+    
+  
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDL-xBqISBgCUUhDvht_d-Ssrx10IBGmME&signed_in=true&callback=initMap" async defer></script>
+    
+    <script type="text/javascript">
+    var loca;
+    function getLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition);
+    } else { 
+        //x.innerHTML = "Geolocation is not supported by this browser.";
+    }
+}
+
+function showPosition(position) {
+    var lat = position.coords.latitude; 
+    var longi = position.coords.longitude;
+    var geocoder = new google.maps.Geocoder;
+    geocodeLatLng(geocoder, lat, longi);
+  /*document.getElementById('submit').addEventListener('click', function() {
+    geocodeLatLng(geocoder, lat, longi);
+  }); */ 
+}
+
+function geocodeLatLng(geocoder, latitude, longitude) {
+  //var input = document.getElementById('latlng').value;
+  //var latlngStr = input.split(',', 2);
+  var latlng = {lat: parseFloat(latitude), lng: parseFloat(longitude)};
+  geocoder.geocode({'location': latlng}, function(results, status) {
+    
+    if (status === google.maps.GeocoderStatus.OK) {
+      if (results[1]) {
+        
+        var loclen = results.length;
+        loca = results[loclen-3].formatted_address;
+        //var loc = document.getElementById('location');
+        
+        //loc.innerHTML = results[loclen-3].formatted_address;
+
+        onLoad(loca);
+
+      } else {
+        window.alert('No results found');
+      }
+    } else {
+      window.alert('Geocoder failed due to: ' + status);
+    }
+  });
+}   
+      // This code generates a "Raw Searcher" to handle search queries. The Raw 
+      // Searcher requires you to handle and draw the search results manually.
+      google.load('search', '1');
+
+      var newsSearch;
+
+      function searchComplete() {
+
+        // Check that we got results
+        if (newsSearch.results && newsSearch.results.length > 0) {
+          for (var i = 0; i < newsSearch.results.length; i++) {
+            var res = newsSearch.results[i];
+            // Create HTML elements for search results
+            var p = document.createElement('p');
+            var pSnip = document.createElement('p');
+            var pPub = document.createElement('p');
+            var imag = document.createElement('img');
+            //var pPubDate = document.createElement('p');
+            var a = document.createElement('a');
+            //a.href="/news-search/v1/newsSearch.results[i].url;"
+            var j = i + 1;
+            a.href= res.unescapedUrl;
+            a.innerHTML =  j + ". " + res.title;
+            pSnip.innerHTML = res.content;
+            pPub.innerHTML = res.publisher + ' ' + '-' + ' ' + res.publishedDate;
+            if(res.image == undefined){
+              p.appendChild(imag);
+            }
+            else{ 
+            imag.src = res.image.url; 
+            imag.alt = res.image.title; 
+            imag.width = 75; 
+            imag.align = "left"
+            p.appendChild(imag);
+          }
+            //pPubDate.innerHTML = res.publishedDate;
+            // Append search results to the HTML nodes
+            
+            p.appendChild(a);
+            p.appendChild(pSnip);
+            p.appendChild(pPub);
+            //p.appendChild(pPubDate);
+            document.body.appendChild(p);
+          }
+        }
+      }
+
+      function onLoad(loca) {
+
+        // Create a News Search instance.
+        newsSearch = new google.search.NewsSearch();
+  
+        // Set searchComplete as the callback function when a search is 
+        // complete.  The newsSearch object will have results in it.
+        newsSearch.setSearchCompleteCallback(this, searchComplete, null);
+
+        newsSearch.setResultSetSize(8);
+
+        // Specify search quer(ies)
+        newsSearch.execute(loca);
+        //alert(loca);
+        // Include the required Google branding
+        google.search.Search.getBranding('branding');
+      }
+
+      // Set a callback to call your code when the page loads
+      //google.setOnLoadCallback(onLoad);
+    </script>
+  
+  
+  </body>
+</html>
